@@ -1,14 +1,18 @@
-import {User} from "../models/user"
+import { User } from "../models/user"
 
 class UserService {
-    
 
-    async delete(productToDelete: string) {
-        throw new Error("Method not implemented.");
+    async delete(idUserToDelete: number) {
+        await User.destroy({
+            where: {
+                id: idUserToDelete
+            }
+        })
     }
 
-    async create(newProduct: typeof User): Promise<InstanceType<typeof User> | null> {
-        return await User.create({ ...newProduct });
+    async create(newUser: typeof User): Promise<InstanceType<typeof User> | null> {
+        return await User.create({ ...newUser });
     }
 }
-export const userService = new UserService()
+
+export const userService = new UserService();
