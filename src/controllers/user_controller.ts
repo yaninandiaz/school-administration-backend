@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction, query } from "express";
+import { Request, Response, NextFunction } from "express";
 import { userService } from "../services/user_service";
 import { User } from "../models/user"
 
