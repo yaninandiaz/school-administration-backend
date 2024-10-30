@@ -18,4 +18,6 @@ async function validateJWT(request: Request, response: Response, next: NextFunct
   }
 }
 
+
+
 export default validateJWT;
