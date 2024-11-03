@@ -1,7 +1,8 @@
 import app from "./app";
+import Logger from "./utils/logger";
 
 const PORT = process.env.PORT || "8080";
 
 app.listen(PORT, () => {
-    console.log("Server listening on port:", PORT);
+    Logger.info("Server listening on port:", PORT);
 });

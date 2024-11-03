@@ -4,7 +4,6 @@ import validateJWT from "../middlewares/verify-jwt";
 
 const userRouter = Router();
 
-userRouter.post("/", userController.create);
 userRouter.post("/register", userController.create);
 userRouter.delete("/:id", validateJWT, userController.delete);
 userRouter.patch("/:id",validateJWT, userController.update);

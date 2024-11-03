@@ -6,7 +6,7 @@ const app = express();
 
 app.use(json());
 
-app.use(generalLogMiddleware)
+app.use(generalLogMiddleware);
 
 app.get("/ping", (request: any, response: any) => {
     response.status(200).json({ message: "pong - the server is running" });
