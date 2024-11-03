@@ -49,4 +49,4 @@ Class.init(
   }
 );
 
-export default Date;
+export default Class;
