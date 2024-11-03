@@ -21,8 +21,8 @@ class ClassController {
     }
 
     async getById(request: Request, response: Response, next: NextFunction) {
-        const idUserToFind = request.params.id as unknown as number
-        const result = await classService.getById(idUserToFind)
+        const idClassToFind = request.params.id as unknown as number
+        const result = await classService.getById(idClassToFind)
         response.status(200).json(result)
     }
 

@@ -1,13 +1,13 @@
-import { Router } from "express"
-import { userController } from "../controllers/user_controller";
+import { Router } from "express";
 import validateJWT from "../middlewares/verify-jwt";
+import { classController } from "../controllers/class_controller";
 
 const classRouter = Router();
 
-classRouter.post("/", userController.create);
-classRouter.delete("/:id", validateJWT, userController.delete);
-classRouter.patch("/:id",validateJWT, userController.update);
-classRouter.get("/:id",validateJWT, userController.getById);
-classRouter.get("/",validateJWT, userController.getAll);
+classRouter.post("/", validateJWT, classController.create);
+classRouter.delete("/:id", validateJWT, classController.delete);
+classRouter.patch("/:id",validateJWT, classController.update);
+classRouter.get("/:id",validateJWT, classController.getById);
+classRouter.get("/",validateJWT, classController.getAll);
 
 export default classRouter;
