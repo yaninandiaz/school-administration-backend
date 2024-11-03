@@ -20,7 +20,7 @@ class UserService {
 
         const user = await User.create({ ...newUser });
 
-        const token = createToken({ id: user.id });
+        const token = createToken({ id: user.id, role:user.role });
 
         return { user, token }
     }
