@@ -13,19 +13,19 @@ class UserService {
     }
 
     async create(newUser: any): Promise<{ user: User, token: string } | null> {
-        const savedUser = await this.getByemail(newUser.email)
+        const savedUser = await this.getByEmail(newUser.email)
         if (savedUser) {
             throw new GeneralError(400, "User already exists")
         }
 
         const user = await User.create({ ...newUser });
 
-        const token = createToken({ id: "user.id" }); // TODO: include the user.id like data to create token
+        const token = createToken({ id: user.id });
 
         return { user, token }
     }
 
-    async getByemail(email: string): Promise<User | null> {
+    async getByEmail(email: string): Promise<User | null> {
         return await User.findOne({ where: { email: email } })
     }
 
