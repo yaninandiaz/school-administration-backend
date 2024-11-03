@@ -1,44 +1,74 @@
-import sequelize, { DataTypes } from "../database/index";
+import { Model, DataTypes, Optional } from 'sequelize';
+import sequelize from "../database/index";
 
-const User = sequelize.define("User", {
+// User's attributes
+interface UserAttributes {
+  id: number;
+  username: string;
+  fullname: string;
+  password: string;
+  email: string;
+  birthday: Date;
+  nationality: string;
+}
+
+// Define an optional type for the creation, excluding fields like id that Sequelize can handle automatically.
+interface UserCreationAttributes extends Optional<UserAttributes, 'id'> {}
+
+// Defines the model
+class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
+  public id!: number;
+  public username!: string;
+  public fullname!: string;
+  public password!: string;
+  public email!: string;
+  public birthday!: Date;
+  public nationality!: string;
+
+  public readonly createdAt!: Date;
+  public readonly updatedAt!: Date;
+}
+
+// Initialize the model with Sequelize
+User.init(
+  {
     id: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        autoIncrement: true,
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
     },
-
     username: {
         type: DataTypes.STRING,
         allowNull: false,
     },
-
     fullname: {
         type: DataTypes.STRING,
         allowNull: false,
     },
-
     password: {
         type: DataTypes.STRING,
         allowNull: false,
     },
-
     email: {
         type: DataTypes.STRING,
         allowNull: false,
         unique: true
     },
-
     birthday: {
         type: DataTypes.DATE,
-
+        allowNull: false,
     },
-
     nationality: {
         type: DataTypes.STRING,
         allowNull: false,
     }
-});
+  },
+  {
+    sequelize,
+    modelName: 'User',
+    tableName: 'users',
+    timestamps: true, // Sequelize adds createdAt and updatedAt fields
+  }
+);
 
-User.sync();
-
-export { User };
+export default User;

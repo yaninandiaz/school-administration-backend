@@ -1,11 +1,11 @@
 import { Request, Response, NextFunction } from "express";
 import { userService } from "../services/user_service";
-import { User } from "../models/user"
+import User from "../models/user";
 
 class UserController {
 
     async create(request: Request, response: Response, next: NextFunction) {
-        const newUser = request.body as typeof User;
+        const newUser = request.body as User;
         const result = await userService.create(newUser)
         response.status(201).json(result)
     }
