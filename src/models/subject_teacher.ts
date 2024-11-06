@@ -1,6 +1,6 @@
 import { Model, DataTypes, Optional } from 'sequelize';
 import sequelize from "../database/index";
-import { Role, TEACHER_TYPE } from '../utils/role';
+import { Role } from '../utils/role';
 import Subject from './subject';
 import User from './user';
 import { GeneralError } from '../errors/general_error';
@@ -10,7 +10,6 @@ interface SubjectTeacherAttributes {
   id: number;
   subjectId: number;
   teacherId: number;
-  teacherType: TEACHER_TYPE;
   enrollmentDate: Date;
 }
 
@@ -20,7 +19,6 @@ class SubjectTeacher extends Model<SubjectTeacherAttributes, SubjectTeacherCreat
   public id!: number;
   public subjectId!: number;
   public teacherId!: number;
-  public teacherType!: TEACHER_TYPE;
   public enrollmentDate!: Date;
 
   public readonly createdAt!: Date;
@@ -49,10 +47,6 @@ SubjectTeacher.init(
         model: User,
         key: "id",
       },
-    },
-    teacherType: {
-      type: DataTypes.ENUM(...Object.values(TEACHER_TYPE)),
-      allowNull: false,
     },
     enrollmentDate: {
       type: DataTypes.DATE,

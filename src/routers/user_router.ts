@@ -7,7 +7,6 @@ const userRouter = Router();
 
 userRouter.post("/register", userController.create);
 userRouter.delete("/:id", validateJWT, validateRoleToDeleteUser, userController.delete);
-// userRouter.patch("/grade/:id", validateJWT, validateAdminOrTeacher, userController.updateGrade);
 userRouter.patch("/:id", validateJWT, validateRoleToUpdateUser, userController.update);
 userRouter.get("/:id", validateJWT, userController.getById);
 userRouter.get("/", validateJWT, userController.getAll);

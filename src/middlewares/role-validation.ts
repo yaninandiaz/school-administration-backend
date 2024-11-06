@@ -37,6 +37,15 @@ export async function validateAdminOrTeacher(request: Request, response: Respons
     response.status(StatusCodes.UNAUTHORIZED).json({ error: ERROR_MESSAGE });
 }
 
+export async function validateAdminOrStudent(request: Request, response: Response, next: NextFunction) {
+    const role = request.requestingUser.role;
+    if (role === Role.ADMIN || role === Role.STUDENT) {
+        next();
+    }
+
+    response.status(StatusCodes.UNAUTHORIZED).json({ error: ERROR_MESSAGE });
+}
+
 export async function validateRoleToUpdateUser(request: Request, response: Response, next: NextFunction) {
     if (request.requestingUser.role === Role.ADMIN) {
         next();

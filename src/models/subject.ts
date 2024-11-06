@@ -6,7 +6,7 @@ interface SubjectAttributes {
   name: string;
   startDate: Date;
   endDate: Date;
-  isAvailableForRegistration: boolean;
+  isAvailableForRegistration?: boolean;
 }
 
 interface SubjectCreationAttributes extends Optional<SubjectAttributes, 'id'> {}
@@ -16,7 +16,7 @@ class Subject extends Model<SubjectAttributes, SubjectCreationAttributes> implem
   public name!: string;
   public startDate!: Date;
   public endDate!: Date;
-  public isAvailableForRegistration!: boolean;
+  public isAvailableForRegistration?: boolean;
 
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;

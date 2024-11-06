@@ -11,6 +11,7 @@ interface SubjectStudentAttributes {
   subjectId: number;
   studentId: number;
   enrollmentDate: Date;
+  grade?: number;
 }
 
 interface SubjectStudentCreationAttributes extends Optional<SubjectStudentAttributes, 'id'> {}
@@ -20,6 +21,7 @@ class SubjectStudent extends Model<SubjectStudentAttributes, SubjectStudentCreat
   public subjectId!: number;
   public studentId!: number;
   public enrollmentDate!: Date;
+  public grade?: number;
 
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
@@ -52,6 +54,10 @@ SubjectStudent.init(
       type: DataTypes.DATE,
       allowNull: false,
     },
+    grade: {
+      type: DataTypes.NUMBER,
+      allowNull: true
+    }
   },
   {
     sequelize,
