@@ -1,8 +1,11 @@
 import express, { json } from "express";
 import indexRouter from "./routers";
 import generalLogMiddleware from "./middlewares/general_logs";
+import helmet from "helmet";
 
 const app = express();
+
+app.use(helmet());
 
 app.use(json());
 
