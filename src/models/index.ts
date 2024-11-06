@@ -52,8 +52,8 @@ Subject.belongsToMany(User, {
     }
 });
 User.belongsToMany(Subject, {
-    through: SubjectStudent,
-    as: "subjects",
+    through: SubjectTeacher,
+    as: "subjectsAsTeacher",
     foreignKey: "teacherId",
     otherKey: "subjectId",
     scope: {

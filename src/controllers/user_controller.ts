@@ -1,34 +1,38 @@
 import { Request, Response, NextFunction } from "express";
 import { userService } from "../services/user_service";
-import User from "../models/user";
+import { UserRequest } from "../requests/user_request";
+import { StatusCodes } from "http-status-codes";
+import { UserToUpdateRequest } from "../requests/user_update_request";
 
 class UserController {
 
     async create(request: Request, response: Response, next: NextFunction) {
-        const newUser = request.body as User;
+        const newUser = request.body as UserRequest;
         const result = await userService.create(newUser)
-        response.status(201).json(result)
+        response.status(StatusCodes.CREATED).json(result)
     }
 
     async delete(request: Request, response: Response, next: NextFunction) {
         const userToDelete = request.params.id as unknown as number
-        const result = await userService.delete(userToDelete)
-        response.status(200).json(result)
+        await userService.delete(request.requestingUser, userToDelete)
+        response.status(StatusCodes.NO_CONTENT)
     }
 
     async update(request: Request, response: Response, next: NextFunction) {
-        // TODO
+        const userToUpdate = request.body as UserToUpdateRequest;
+        const result = await userService.update(request.requestingUser, userToUpdate)
+        response.status(StatusCodes.OK).json(result)
     }
 
     async getById(request: Request, response: Response, next: NextFunction) {
         const idUserToFind = request.params.id as unknown as number
         const result = await userService.getById(idUserToFind)
-        response.status(200).json(result)
+        response.status(StatusCodes.OK).json(result)
     }
 
     async getAll(request: Request, response: Response, next: NextFunction) {
-        const result = await userService.getAll()
-        response.status(200).json(result)
+        const result = await userService.getAll(request.requestingUser);
+        response.status(StatusCodes.OK).json(result)
     }
 }
 
