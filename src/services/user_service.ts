@@ -10,10 +10,62 @@ import { UserRequest, validateUserRequestData } from "../requests/user_request";
 import { getSecurePassword } from "../utils/password";
 import { UserResponse } from "../responses/user_response";
 import { UserToUpdateRequest, validateUserToUpdateRequestData } from "../requests/user_update_request";
+import { LoginRequest, validateLoginRequestData } from "../requests/login_request";
+import { LoginResponse } from "../responses/login_response";
 
 class UserService {
+    
+    async login(dataLogin: LoginRequest): Promise<LoginResponse> {
+        const resultValidation = validateLoginRequestData(dataLogin);
+        if (!resultValidation.success) {
+            throw new GeneralError(StatusCodes.BAD_REQUEST, "Incorrect input to login: " + JSON.stringify(resultValidation.error));
+        }
 
-    async create(newUser: UserRequest): Promise<{ user: UserResponse, token: string } | null> {
+        const savedUser = await this.getByEmail(dataLogin.email);
+        if (!savedUser) {
+            throw new GeneralError(StatusCodes.BAD_REQUEST, "Incorrect information to login");
+        }
+
+        const securityPassword = await getSecurePassword(dataLogin.password);
+        if (savedUser.password !== securityPassword) {
+            throw new GeneralError(StatusCodes.UNAUTHORIZED, "Unauthorized to login");
+        }
+
+        await User.update(
+            { loginExpired: false },
+            {
+                where: {
+                    id: savedUser.id,
+                }
+            }
+        );
+
+        const token = createToken({ id: savedUser.id, role: savedUser.role });
+
+        return { token }
+    }
+
+    async logout(requestingUser: RequestingUser, userId: number) {
+        if (requestingUser.userId !== userId) {
+            throw new GeneralError(StatusCodes.UNAUTHORIZED, "Unauthorized to logout");
+        }
+
+        const savedUser = await this.getById(userId);
+        if (!savedUser) {
+            throw new GeneralError(StatusCodes.BAD_REQUEST, "Incorrect information to logout");
+        }
+
+        await User.update(
+            { loginExpired: true },
+            {
+                where: {
+                    id: savedUser.id,
+                }
+            }
+        );
+    }
+
+    async create(newUser: UserRequest): Promise<UserResponse | null> {
         const resultValidation = validateUserRequestData(newUser);
         if (!resultValidation.success) {
             throw new GeneralError(StatusCodes.BAD_REQUEST, "Incorrect input for user to create: " + JSON.stringify(resultValidation.error));
@@ -25,11 +77,7 @@ class UserService {
         }
 
         const password = await getSecurePassword(newUser.password);
-        const user = await User.create({ ...newUser, password, isActive: true });
-
-        const token = createToken({ id: user.id, role: user.role });
-
-        return { user, token }
+        return await User.create({ ...newUser, password, isActive: true, loginExpired: true });
     }
 
     async delete(requestingUser: RequestingUser, idUserToDelete: number) {

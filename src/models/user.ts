@@ -14,6 +14,7 @@ interface UserAttributes {
   nationality: string;
   role: Role;
   isActive: boolean;
+  loginExpired: boolean;
 }
 
 // Define an optional type for the creation, excluding fields like id that Sequelize can handle automatically.
@@ -30,6 +31,7 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
   public nationality!: string;
   public role!: Role;
   public isActive!: boolean;
+  public loginExpired!: boolean;
 
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
@@ -75,6 +77,10 @@ User.init(
     isActive: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
+    },
+    loginExpired: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
     }
   },
   {

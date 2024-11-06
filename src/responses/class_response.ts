@@ -3,4 +3,4 @@ export interface ClassResponse {
     name: string;
     startDate: Date;
     endDate: Date;
-  }
+}

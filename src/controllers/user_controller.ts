@@ -3,9 +3,10 @@ import { userService } from "../services/user_service";
 import { UserRequest } from "../requests/user_request";
 import { StatusCodes } from "http-status-codes";
 import { UserToUpdateRequest } from "../requests/user_update_request";
+import { LoginRequest } from "../requests/login_request";
 
 class UserController {
-
+    
     async create(request: Request, response: Response, next: NextFunction) {
         const newUser = request.body as UserRequest;
         const result = await userService.create(newUser)
@@ -33,6 +34,18 @@ class UserController {
     async getAll(request: Request, response: Response, next: NextFunction) {
         const result = await userService.getAll(request.requestingUser);
         response.status(StatusCodes.OK).json(result)
+    }
+
+    async login(request: Request, response: Response, next: NextFunction) {
+        const dataLogin = request.body as LoginRequest;
+        const result = await userService.login(dataLogin)
+        response.status(StatusCodes.OK).json(result)
+    }
+
+    async logout(request: Request, response: Response, next: NextFunction) {
+        const userId = request.params.id as unknown as number;
+        await userService.logout(request.requestingUser, userId)
+        response.status(StatusCodes.NO_CONTENT)
     }
 }
 
