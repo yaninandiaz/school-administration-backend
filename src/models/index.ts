@@ -1,78 +1,47 @@
 import { Role } from "../utils/role";
 import Class from "./class";
-import ClassAttendance from "./class_attendance";
-import Subject from "./subject";
-import SubjectStudent from "./subject_student";
-import SubjectTeacher from "./subject_teacher";
+import ClassStudent from "./class_student";
+import ClassTeacher from "./class_teacher";
 import User from "./user";
 
-// Relationship between Subject and Class
-Subject.hasMany(Class, { 
-    foreignKey: "subjectId",
-    as: "classes",
- });
-Class.belongsTo(Subject, { 
-    foreignKey: "subjectId",
-    as: "subject",
- });
-// Relationship between Class and guest teacher
-Class.belongsTo(User, {
-    foreignKey: "guestTeacherId",
-    as: "guestTeacher",
-});
-
-// Relationship between Subject and Student - many to many
-Subject.belongsToMany(User, {
-    through: SubjectStudent,
+// Relationship between Class and Student - many to many
+Class.belongsToMany(User, {
+    through: ClassStudent,
     as: "students",
-    foreignKey: "subjectId",
+    foreignKey: "classId",
     otherKey: "studentId",
     scope: {
         role: Role.STUDENT,
     }
 });
-User.belongsToMany(Subject, {
-    through: SubjectStudent,
-    as: "subjects",
+User.belongsToMany(Class, {
+    through: ClassStudent,
+    as: "classes",
     foreignKey: "studentId",
-    otherKey: "subjectId",
+    otherKey: "classId",
     scope: {
         role: Role.STUDENT,
     }
 });
 
-// Relationship between Subject and Teacher - many to many
-Subject.belongsToMany(User, {
-    through: SubjectTeacher,
+// Relationship between Class and Teacher - many to many
+Class.belongsToMany(User, {
+    through: ClassTeacher,
     as: "teachers",
-    foreignKey: "subjectId",
+    foreignKey: "classId",
     otherKey: "teacherId",
     scope: {
         role: Role.TEACHER,
     }
 });
-User.belongsToMany(Subject, {
-    through: SubjectTeacher,
-    as: "subjectsAsTeacher",
+User.belongsToMany(Class, {
+    through: ClassTeacher,
+    as: "classesAsTeacher",
     foreignKey: "teacherId",
-    otherKey: "subjectId",
+    otherKey: "classId",
     scope: {
         role: Role.TEACHER,
     }
 });
 
-// Relationship between Subject and User, for the attendance - many to many
-User.belongsToMany(Class, {
-    through: ClassAttendance,
-    as: "classes",
-    foreignKey: "userId",
-    otherKey: "classId",
-});
-Class.belongsToMany(User, {
-    through: ClassAttendance,
-    as: "users",
-    foreignKey: "classId",
-    otherKey: "userId",
-});
-
-export { User, Subject, Class, ClassAttendance, SubjectStudent, SubjectTeacher };
+export { User, Class, ClassStudent, ClassTeacher };

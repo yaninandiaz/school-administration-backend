@@ -1,44 +1,42 @@
 import { Model, DataTypes, Optional } from 'sequelize';
 import sequelize from "../database/index";
-import { Role, TEACHER_TYPE } from '../utils/role';
-import Subject from './subject';
+import { Role } from '../utils/role';
 import User from './user';
 import { GeneralError } from '../errors/general_error';
 import { StatusCodes } from 'http-status-codes';
+import Class from './class';
 
-interface SubjectTeacherAttributes {
+interface ClassTeacherAttributes {
   id: number;
-  subjectId: number;
+  classId: number;
   teacherId: number;
-  teacherType: TEACHER_TYPE;
   enrollmentDate: Date;
 }
 
-interface SubjectTeacherCreationAttributes extends Optional<SubjectTeacherAttributes, 'id'> {}
+interface ClassTeacherCreationAttributes extends Optional<ClassTeacherAttributes, 'id'> {}
 
-class SubjectTeacher extends Model<SubjectTeacherAttributes, SubjectTeacherCreationAttributes> implements SubjectTeacherAttributes {
+class ClassTeacher extends Model<ClassTeacherAttributes, ClassTeacherCreationAttributes> implements ClassTeacherAttributes {
   public id!: number;
-  public subjectId!: number;
+  public classId!: number;
   public teacherId!: number;
-  public teacherType!: TEACHER_TYPE;
   public enrollmentDate!: Date;
 
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 }
 
-SubjectTeacher.init(
+ClassTeacher.init(
   {
     id: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
       primaryKey: true,
     },
-    subjectId: {
+    classId: {
       type: DataTypes.INTEGER,
       allowNull: true,
       references: {
-        model: Subject,
+        model: Class,
         key: "id",
       },
     },
@@ -50,10 +48,6 @@ SubjectTeacher.init(
         key: "id",
       },
     },
-    teacherType: {
-      type: DataTypes.ENUM(...Object.values(TEACHER_TYPE)),
-      allowNull: false,
-    },
     enrollmentDate: {
       type: DataTypes.DATE,
       allowNull: false,
@@ -61,12 +55,12 @@ SubjectTeacher.init(
   },
   {
     sequelize,
-    modelName: 'SubjectTeacher',
-    tableName: 'subjects_teachers',
+    modelName: 'ClassTeacher',
+    tableName: 'classes_teachers',
     timestamps: true,
     hooks: {
-        beforeCreate: async (subjectTeacher, options) => {
-            const user = await User.findByPk(subjectTeacher.teacherId);
+        beforeCreate: async (classTeacher, options) => {
+            const user = await User.findByPk(classTeacher.teacherId);
             if (user?.role !== Role.TEACHER) {
                 throw new GeneralError(StatusCodes.CONFLICT, "The user should be a Teacher");
             }
@@ -75,4 +69,4 @@ SubjectTeacher.init(
   }
 );
 
-export default SubjectTeacher;
+export default ClassTeacher;

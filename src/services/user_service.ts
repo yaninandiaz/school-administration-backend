@@ -1,10 +1,9 @@
 import { GeneralError } from "../errors/general_error";
 import { createToken } from "../utils/token";
 import User from "../models/user";
-import { Role, TEACHER_TYPE } from "../utils/role";
+import { Role } from "../utils/role";
 import { RequestingUser } from "../utils/entity";
-import { Op } from "sequelize";
-import { Subject } from "../models";
+import { Class } from "../models";
 import Logger from "../utils/logger";
 import { StatusCodes } from "http-status-codes";
 import { UserRequest, validateUserRequestData } from "../requests/user_request";
@@ -135,8 +134,8 @@ class UserService {
                 },
                 include: [
                     {
-                        model: Subject,
-                        as: 'subjects',
+                        model: Class,
+                        as: 'classes',
                         include: [
                             {
                                 model: User,
@@ -145,9 +144,6 @@ class UserService {
                                 where: {
                                     id: teacherId,
                                     role: Role.TEACHER,
-                                    '$teachers.SubjectTeacher.teacherType$': {
-                                        [Op.in]: [TEACHER_TYPE.TEACHER, TEACHER_TYPE.ASSISTANT_TEACHER],
-                                    }
                                 },
                                 through: {
                                     attributes: [],
