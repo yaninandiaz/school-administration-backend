@@ -10,20 +10,5 @@ const sequelize = new Sequelize(
   }
 );
 
-/*
-
-constructor(database: string, username: string, password?: string, options?: Options);
-  constructor(database: string, username: string, options?: Options);
-  constructor(options?: Options);
-
-  DATABASE_NAME=school
-DATABASE_USERNAME=postgres
-DATABASE_PASSWORD=
-DATABASE_HOST=localhost
-DATABASE_DIALECT=postgres
-
-*/
-
-
 export { DataTypes };
 export default sequelize;
