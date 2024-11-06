@@ -1,10 +1,9 @@
 import { z } from "zod";
 
-const subjectRequestSchema = z.object({
+const classRequestSchema = z.object({
     name: z.string().min(4, "The name must be at least 4 characters."),
     startDate: z.date(),
     endDate: z.date(),
-    isAvailableForRegistration: z.boolean().optional(),
 }).refine((data) => {
     // We check that the end date is at least one day after the start date
     const diffInTime = data.endDate.getTime() - data.startDate.getTime();
@@ -13,13 +12,12 @@ const subjectRequestSchema = z.object({
     message: "The end date must be at least 1 day after the start date.",
 });
 
-export interface SubjectRequest {
-    name: string;
-    startDate: Date;
-    endDate: Date;
-    isAvailableForRegistration: boolean;
+export interface ClassToUpdateRequest {
+    name?: string;
+    startDate?: Date;
+    endDate?: Date;
 }
 
-export function validateSubjectRequestData(data: {}) {
-    return subjectRequestSchema.safeParse(data);
+export function validateClassToUpdateRequestData(data: {}) {
+    return classRequestSchema.safeParse(data);
 }

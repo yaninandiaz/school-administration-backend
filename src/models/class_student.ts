@@ -1,24 +1,24 @@
 import { Model, DataTypes, Optional } from 'sequelize';
 import sequelize from "../database/index";
 import { Role } from '../utils/role';
-import Subject from './subject';
 import User from './user';
 import { GeneralError } from '../errors/general_error';
 import { StatusCodes } from 'http-status-codes';
+import Class from './class';
 
-interface SubjectStudentAttributes {
+interface ClassStudentAttributes {
   id: number;
-  subjectId: number;
+  classId: number;
   studentId: number;
   enrollmentDate: Date;
   grade?: number;
 }
 
-interface SubjectStudentCreationAttributes extends Optional<SubjectStudentAttributes, 'id'> {}
+interface ClassStudentCreationAttributes extends Optional<ClassStudentAttributes, 'id'> {}
 
-class SubjectStudent extends Model<SubjectStudentAttributes, SubjectStudentCreationAttributes> implements SubjectStudentAttributes {
+class ClassStudent extends Model<ClassStudentAttributes, ClassStudentCreationAttributes> implements ClassStudentAttributes {
   public id!: number;
-  public subjectId!: number;
+  public classId!: number;
   public studentId!: number;
   public enrollmentDate!: Date;
   public grade?: number;
@@ -27,18 +27,18 @@ class SubjectStudent extends Model<SubjectStudentAttributes, SubjectStudentCreat
   public readonly updatedAt!: Date;
 }
 
-SubjectStudent.init(
+ClassStudent.init(
   {
     id: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
       primaryKey: true,
     },
-    subjectId: {
+    classId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: Subject,
+        model: Class,
         key: "id",
       },
     },
@@ -61,12 +61,12 @@ SubjectStudent.init(
   },
   {
     sequelize,
-    modelName: 'SubjectStudent',
-    tableName: 'subject_students',
+    modelName: 'ClassStudent',
+    tableName: 'classes_students',
     timestamps: true,
     hooks: {
-        beforeCreate: async (subjectStudent, options) => {
-            const user = await User.findByPk(subjectStudent.studentId);
+        beforeCreate: async (classStudent, options) => {
+            const user = await User.findByPk(classStudent.studentId);
             if (user?.role !== Role.STUDENT) {
                 throw new GeneralError(StatusCodes.CONFLICT, "The user should be a Student");
             }
@@ -75,4 +75,4 @@ SubjectStudent.init(
   }
 );
 
-export default SubjectStudent;
+export default ClassStudent;

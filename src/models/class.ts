@@ -1,28 +1,26 @@
 import { Model, DataTypes, Optional } from 'sequelize';
 import sequelize from "../database/index";
 
-interface SubjectAttributes {
+interface ClassAttributes {
   id: number;
   name: string;
   startDate: Date;
   endDate: Date;
-  isAvailableForRegistration?: boolean;
 }
 
-interface SubjectCreationAttributes extends Optional<SubjectAttributes, 'id'> {}
+interface ClassCreationAttributes extends Optional<ClassAttributes, 'id'> {}
 
-class Subject extends Model<SubjectAttributes, SubjectCreationAttributes> implements SubjectAttributes {
+class Class extends Model<ClassAttributes, ClassCreationAttributes> implements ClassAttributes {
   public id!: number;
   public name!: string;
   public startDate!: Date;
   public endDate!: Date;
-  public isAvailableForRegistration?: boolean;
 
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 }
 
-Subject.init(
+Class.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -41,17 +39,13 @@ Subject.init(
         type: DataTypes.DATE,
         allowNull: false,
     },
-    isAvailableForRegistration: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
-    }
   },
   {
     sequelize,
-    modelName: 'Subject',
-    tableName: 'subjects',
+    modelName: 'Class',
+    tableName: 'classes',
     timestamps: true,
   }
 );
 
-export default Subject;
+export default Class;
