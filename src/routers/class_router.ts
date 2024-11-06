@@ -5,7 +5,7 @@ import { validateAdmin, validateAdminOrTeacher } from "../middlewares/role-valid
 
 const classRouter = Router();
 
-classRouter.post("/", validateJWT, validateAdmin, classController.create);
+classRouter.post("/", validateJWT, validateAdminOrTeacher, classController.create);
 classRouter.delete("/:id", validateJWT, validateAdmin, classController.delete);
 classRouter.patch("/:id",validateJWT, validateAdminOrTeacher, classController.update);
 classRouter.get("/:id",validateJWT, classController.getById);
