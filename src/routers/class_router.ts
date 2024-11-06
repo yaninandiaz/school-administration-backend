@@ -1,12 +1,13 @@
 import { Router } from "express";
 import validateJWT from "../middlewares/verify-jwt";
 import { classController } from "../controllers/class_controller";
+import { validateAdmin, validateAdminOrTeacher } from "../middlewares/role-validation";
 
 const classRouter = Router();
 
-classRouter.post("/", validateJWT, classController.create);
-classRouter.delete("/:id", validateJWT, classController.delete);
-classRouter.patch("/:id",validateJWT, classController.update);
+classRouter.post("/", validateJWT, validateAdmin, classController.create);
+classRouter.delete("/:id", validateJWT, validateAdmin, classController.delete);
+classRouter.patch("/:id",validateJWT, validateAdminOrTeacher, classController.update);
 classRouter.get("/:id",validateJWT, classController.getById);
 classRouter.get("/",validateJWT, classController.getAll);
 
