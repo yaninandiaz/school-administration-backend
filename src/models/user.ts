@@ -1,6 +1,7 @@
 import { Model, DataTypes, Optional } from 'sequelize';
 import sequelize from "../database/index";
 import { Role } from '../utils/role';
+import { boolean } from 'zod';
 
 // User's attributes
 interface UserAttributes {
@@ -12,6 +13,7 @@ interface UserAttributes {
   birthday: Date;
   nationality: string;
   role: Role;
+  isActive: boolean;
 }
 
 // Define an optional type for the creation, excluding fields like id that Sequelize can handle automatically.
@@ -27,6 +29,7 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
   public birthday!: Date;
   public nationality!: string;
   public role!: Role;
+  public isActive!: boolean;
 
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
@@ -68,6 +71,10 @@ User.init(
     role: {
         type: DataTypes.STRING,
         allowNull: false,
+    },
+    isActive: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
     }
   },
   {
