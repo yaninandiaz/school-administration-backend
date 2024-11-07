@@ -48,4 +48,6 @@ Class.init(
   }
 );
 
+Class.sync();
+
 export default Class;
