@@ -2,8 +2,12 @@ import { z } from "zod";
 
 const classRequestSchema = z.object({
     name: z.string().min(4, "The name must be at least 4 characters."),
-    startDate: z.date(),
-    endDate: z.date(),
+    startDate: z
+        .preprocess((arg) => (typeof arg === "string" ? new Date(arg) : arg), z.date())
+        .refine((date) => !isNaN(date.getTime()), { message: "Invalid start date format." }),
+    endDate: z
+        .preprocess((arg) => (typeof arg === "string" ? new Date(arg) : arg), z.date())
+        .refine((date) => !isNaN(date.getTime()), { message: "Invalid end date format." }),
 }).refine((data) => {
     // We check that the end date is at least one day after the start date
     const diffInTime = data.endDate.getTime() - data.startDate.getTime();

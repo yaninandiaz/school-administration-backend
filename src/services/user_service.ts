@@ -3,8 +3,6 @@ import { createToken } from "../utils/token";
 import User from "../models/user";
 import { Role } from "../utils/role";
 import { RequestingUser } from "../utils/entity";
-import { Class } from "../models";
-import Logger from "../utils/logger";
 import { StatusCodes } from "http-status-codes";
 import { UserRequest, validateUserRequestData } from "../requests/user_request";
 import { getSecurePassword } from "../utils/password";
@@ -12,6 +10,7 @@ import { UserResponse } from "../responses/user_response";
 import { UserToUpdateRequest, validateUserToUpdateRequestData } from "../requests/user_update_request";
 import { LoginRequest, validateLoginRequestData } from "../requests/login_request";
 import { LoginResponse } from "../responses/login_response";
+import bcrypt from "bcrypt";
 
 class UserService {
 
@@ -26,8 +25,8 @@ class UserService {
             throw new GeneralError(StatusCodes.BAD_REQUEST, "Incorrect information to login");
         }
 
-        const securityPassword = await getSecurePassword(dataLogin.password);
-        if (savedUser.password !== securityPassword) {
+        const match = await bcrypt.compare(dataLogin.password, savedUser.dataValues.password);
+        if (!match) {
             throw new GeneralError(StatusCodes.UNAUTHORIZED, "Unauthorized to login");
         }
 
@@ -35,12 +34,12 @@ class UserService {
             { loginExpired: false },
             {
                 where: {
-                    id: savedUser.id,
+                    id: savedUser.dataValues.id,
                 }
             }
         );
 
-        const token = createToken({ id: savedUser.id, role: savedUser.role });
+        const token = createToken({ id: savedUser.dataValues.id, role: savedUser.dataValues.role });
 
         return { token }
     }
@@ -77,7 +76,18 @@ class UserService {
         }
 
         const password = await getSecurePassword(newUser.password);
-        return await User.create({ ...newUser, password, isActive: true, loginExpired: true });
+        const user = await User.create({ ...newUser, password, isActive: true, loginExpired: true });
+
+        return {
+            id: user.dataValues.id,
+            username: user.dataValues.username,
+            fullname: user.dataValues.fullname,
+            email: user.dataValues.email,
+            birthday: user.dataValues.birthday,
+            nationality: user.dataValues.nationality,
+            role: user.dataValues.role,
+            isActive: user.dataValues.isActive,
+        }
     }
 
     async delete(requestingUser: RequestingUser, idUserToDelete: number) {
@@ -141,12 +151,41 @@ class UserService {
     }
 
     async getById(idUserToFind: number): Promise<UserResponse | null> {
-        return await User.findByPk(idUserToFind);
+        const user = await User.findByPk(idUserToFind);
+
+        if (!user) {
+            return null;
+        }
+
+        return {
+            id: user.dataValues.id,
+            username: user.dataValues.username,
+            fullname: user.dataValues.fullname,
+            email: user.dataValues.email,
+            birthday: user.dataValues.birthday,
+            nationality: user.dataValues.nationality,
+            role: user.dataValues.role,
+            isActive: user.dataValues.isActive,
+        }
     }
 
-    async getAll(user: RequestingUser): Promise<UserResponse[]> {
+    async getAll(user: RequestingUser, page: number = 0, pageSize: number = 20): Promise<UserResponse[]> {
         if (user.role === Role.ADMIN) {
-            return await User.findAll();
+            const users = await User.findAll({
+                limit: pageSize,
+                offset: page == 0 ? 0 : (page - 1) * pageSize
+            });
+
+            return users.map(user => ({
+                id: user.dataValues.id,
+                username: user.dataValues.username,
+                fullname: user.dataValues.fullname,
+                email: user.dataValues.email,
+                birthday: user.dataValues.birthday,
+                nationality: user.dataValues.nationality,
+                role: user.dataValues.role,
+                isActive: user.dataValues.isActive,
+            }));
         }
 
         const userById = await this.getById(user.userId);
@@ -154,60 +193,7 @@ class UserService {
             return [];
         }
 
-        if (user.role === Role.TEACHER) {
-            // This person can only see its user and the students it has.
-            const users: User[] = await this.getStudentsByTeacher(user.userId);
-            const usersReponse = users.map(user => ({
-                id: user.id,
-                username: user.username,
-                fullname: user.fullname,
-                email: user.email,
-                birthday: user.birthday,
-                nationality: user.nationality,
-                role: user.role,
-                isActive: user.isActive,
-            }));
-
-            return [userById, ...usersReponse]
-        }
-
         return [userById];
-    }
-
-    async getStudentsByTeacher(teacherId: number): Promise<User[]> {
-        try {
-            const students = await User.findAll({
-                where: {
-                    role: Role.STUDENT,
-                },
-                include: [
-                    {
-                        model: Class,
-                        as: 'classes',
-                        include: [
-                            {
-                                model: User,
-                                as: 'teachers',
-                                required: true,
-                                where: {
-                                    id: teacherId,
-                                    role: Role.TEACHER,
-                                },
-                                through: {
-                                    attributes: [],
-                                },
-                            },
-                        ],
-                    },
-                ],
-            });
-
-            return students;
-        } catch (error) {
-            const message = 'Error fetching students by teacher';
-            Logger.error(message, error);
-            throw new GeneralError(StatusCodes.INTERNAL_SERVER_ERROR, message);
-        }
     }
 
     private async getByEmail(email: string): Promise<User | null> {

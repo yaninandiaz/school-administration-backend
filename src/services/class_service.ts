@@ -20,7 +20,7 @@ class ClassService {
 
         let message = null;
         const savedClass = await this.getByName(newClass.name);
-        if (savedClass && savedClass.startDate == newClass.startDate && savedClass.endDate == newClass.endDate) {
+        if (savedClass && savedClass.dataValues.startDate == newClass.startDate && savedClass.dataValues.endDate == newClass.endDate) {
             message = "There is another matter already created with the same characteristics";
         }
 
@@ -28,10 +28,10 @@ class ClassService {
 
         return {
             class: {
-                id: oneClass.id,
-                name: oneClass.name,
-                startDate: oneClass.startDate,
-                endDate: oneClass.endDate,
+                id: oneClass.dataValues.id,
+                name: oneClass.dataValues.name,
+                startDate: oneClass.dataValues.startDate,
+                endDate: oneClass.dataValues.endDate,
             },
             message: message ?? DEFAULT_MSG_TO_CREATE,
         }
@@ -49,7 +49,7 @@ class ClassService {
         }
 
         await Class.update(
-            { ...savedClass, ...classToUpdate },
+            { ...savedClass.dataValues, ...classToUpdate },
             {
                 where: {
                     id: classId,
@@ -63,10 +63,10 @@ class ClassService {
         }
 
         return {
-            id: oneClass.id,
-            name: oneClass.name,
-            startDate: oneClass.startDate,
-            endDate: oneClass.endDate,
+            id: oneClass.dataValues.id,
+            name: oneClass.dataValues.name,
+            startDate: oneClass.dataValues.startDate,
+            endDate: oneClass.dataValues.endDate,
         }
     }
 
@@ -81,7 +81,7 @@ class ClassService {
             throw new GeneralError(StatusCodes.BAD_REQUEST, "Incorrect information to update grade");
         }
 
-        const result = await ClassStudent.update(
+        await ClassStudent.update(
             { grade: studentGrade.grade },
             {
                 where: {
@@ -90,8 +90,6 @@ class ClassService {
                 }
             }
         );
-
-        // TODO CHECK THE result
 
         return { message: "Grade assigned" };
     }
@@ -112,8 +110,11 @@ class ClassService {
         return await Class.findByPk(idClassToFind);
     }
 
-    async getAll(): Promise<Class[] | null> {
-        return await Class.findAll();
+    async getAll(page: number = 0, pageSize: number = 20): Promise<Class[] | null> {
+        return await Class.findAll({
+            limit: pageSize,
+            offset: page == 0 ? 0 : (page - 1) * pageSize
+        });
     }
 
     async enrollStudent(classId: number, studentId: number): Promise<{ message: string }> {
@@ -123,13 +124,11 @@ class ClassService {
             throw new GeneralError(StatusCodes.BAD_REQUEST, "Incorrect information to enroll student");
         }
 
-        const result = await ClassStudent.create({
+        await ClassStudent.create({
             classId,
             studentId,
             enrollmentDate: new Date(),
         });
-
-        // TODO CHECK THE result
 
         return { message: "Student enrolls" };
     }
@@ -141,17 +140,11 @@ class ClassService {
             throw new GeneralError(StatusCodes.BAD_REQUEST, "Incorrect information to enroll teacher");
         }
 
-        const result = await ClassTeacher.update(
-            { enrollmentDate: new Date() },
-            {
-                where: {
-                    classId, 
-                    teacherId
-                }
-            }
-        );
-
-        // TODO CHECK THE result
+        await ClassTeacher.create({
+            classId,
+            teacherId,
+            enrollmentDate: new Date(),
+        });
 
         return { message: "Teacher enrolls" };
     }
@@ -163,7 +156,7 @@ class ClassService {
             throw new GeneralError(StatusCodes.BAD_REQUEST, "Incorrect information to disenroll student");
         }
 
-        const result = await ClassStudent.destroy(
+        await ClassStudent.destroy(
             {
                 where: {
                     classId, 
@@ -172,19 +165,17 @@ class ClassService {
             }
         );
 
-        // TODO CHECK THE result
-
-        return { message: "Student enrolls" };
+        return { message: "Student disenrolls" };
     }
 
     async disenrollTeacher(classId: number, teacherId: number): Promise<{ message: string }> {
         const savedClass = await Class.findOne({ where: { id: classId } });
         const savedTeacher = await User.findOne({ where: { id: teacherId, role: Role.TEACHER } });
-        if (!savedClass || !teacherId) {
+        if (!savedClass || !savedTeacher) {
             throw new GeneralError(StatusCodes.BAD_REQUEST, "Incorrect information to disenroll teacher");
         }
 
-        const result = await ClassTeacher.destroy(
+        await ClassTeacher.destroy(
             {
                 where: {
                     classId, 
@@ -192,8 +183,6 @@ class ClassService {
                 }
             }
         );
-
-        // TODO CHECK THE result
 
         return { message: "Teacher disenrolls" };
     }

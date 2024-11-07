@@ -32,7 +32,9 @@ class UserController {
     }
 
     async getAll(request: Request, response: Response, next: NextFunction) {
-        const result = await userService.getAll(request.requestingUser);
+        const page = request.query.page as unknown as number
+        const pageSize = request.query.pageSize as unknown as number
+        const result = await userService.getAll(request.requestingUser, page, pageSize);
         response.status(StatusCodes.OK).json(result)
     }
 

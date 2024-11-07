@@ -6,7 +6,7 @@ function createToken(data: { id: number, role: Role }) {
     expiresIn: "1d", 
   });
 
-  return token;
+  return "Bearer " + token;
 }
 
 export { createToken };

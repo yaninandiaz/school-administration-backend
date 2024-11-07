@@ -41,7 +41,9 @@ class ClassController {
     }
 
     async getAll(request: Request, response: Response, next: NextFunction) {
-        const result = await classService.getAll()
+        const page = request.query.page as unknown as number
+        const pageSize = request.query.pageSize as unknown as number
+        const result = await classService.getAll(page, pageSize)
         response.status(StatusCodes.OK).json(result)
     }
 

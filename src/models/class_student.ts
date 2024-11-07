@@ -1,9 +1,6 @@
 import { Model, DataTypes, Optional } from 'sequelize';
 import sequelize from "../database/index";
-import { Role } from '../utils/role';
 import User from './user';
-import { GeneralError } from '../errors/general_error';
-import { StatusCodes } from 'http-status-codes';
 import Class from './class';
 
 interface ClassStudentAttributes {
@@ -64,14 +61,6 @@ ClassStudent.init(
     modelName: 'ClassStudent',
     tableName: 'classes_students',
     timestamps: true,
-    hooks: {
-        beforeCreate: async (classStudent, options) => {
-            const user = await User.findByPk(classStudent.studentId);
-            if (user?.role !== Role.STUDENT) {
-                throw new GeneralError(StatusCodes.CONFLICT, "The user should be a Student");
-            }
-        }
-    },
   }
 );
 

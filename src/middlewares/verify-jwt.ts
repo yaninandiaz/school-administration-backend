@@ -18,19 +18,19 @@ async function validateJWT(request: Request, response: Response, next: NextFunct
   }
 
   try {
-    const data = jwt.verify(token, process.env.SECRET_KEY as string) as any;
+    const data = jwt.verify(token, process.env.SECRET_KEY as string) as { id: number; role: string; iat?: number; exp?: number};
 
     const savedUser = await User.findByPk(data.id);
-    if (!savedUser || savedUser.loginExpired) {
-      response.status(StatusCodes.UNAUTHORIZED).json({ error: "Unauthorized. Login, please." });
-      next();
+
+    if (!savedUser || savedUser.dataValues.loginExpired) {
+      return response.status(StatusCodes.UNAUTHORIZED).json({ error: "Unauthorized. Login, please." });
     }
 
     request.requestingUser = { userId: data.id, role: data.role } as RequestingUser;
 
     next();
   } catch (error) {
-    response.status(StatusCodes.UNAUTHORIZED).json({ error: "Invalid token" });
+    return response.status(StatusCodes.UNAUTHORIZED).json({ error: "Invalid token" });
   }
 }
 
