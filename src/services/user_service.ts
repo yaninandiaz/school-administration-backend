@@ -77,18 +77,7 @@ class UserService {
         }
 
         const password = await getSecurePassword(newUser.password);
-        const user = await User.create({ ...newUser, password, isActive: true, loginExpired: true });
-
-        return {
-            id: user.id,
-            username: user.username,
-            fullname: user.fullname,
-            email: user.email,
-            birthday: user.birthday,
-            nationality: user.nationality,
-            role: user.role,
-            isActive: user.isActive,
-        } as UserResponse
+        return await User.create({ ...newUser, password, isActive: true, loginExpired: true });
     }
 
     async delete(requestingUser: RequestingUser, idUserToDelete: number) {
