@@ -69,4 +69,6 @@ ClassTeacher.init(
   }
 );
 
+ClassTeacher.sync();
+
 export default ClassTeacher;

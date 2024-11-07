@@ -55,7 +55,7 @@ ClassStudent.init(
       allowNull: false,
     },
     grade: {
-      type: DataTypes.NUMBER,
+      type: DataTypes.DOUBLE,
       allowNull: true
     }
   },
@@ -74,5 +74,7 @@ ClassStudent.init(
     },
   }
 );
+
+ClassStudent.sync();
 
 export default ClassStudent;

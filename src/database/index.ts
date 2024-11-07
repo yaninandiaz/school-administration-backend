@@ -1,4 +1,8 @@
-import { Sequelize, DataTypes, Dialect } from "sequelize";
+import { Sequelize, DataTypes } from "sequelize";
+import dotenv from "dotenv";
+import Logger from "../utils/logger";
+
+dotenv.config();
 
 const sequelize = new Sequelize(
   process.env.DATABASE_NAME as string,
@@ -9,6 +13,15 @@ const sequelize = new Sequelize(
     dialect: "postgres",
   }
 );
+
+(async () => {
+  try {
+    await sequelize.authenticate();
+    Logger.info("Connection has been established successfully");
+  } catch (error) {
+    Logger.error("Unable to connect to the database: ", error);
+  }
+})();
 
 export { DataTypes };
 export default sequelize;

@@ -10,5 +10,7 @@ userRouter.delete("/:id", validateJWT, validateRoleToDeleteUser, userController.
 userRouter.patch("/:id", validateJWT, validateRoleToUpdateUser, userController.update);
 userRouter.get("/:id", validateJWT, userController.getById);
 userRouter.get("/", validateJWT, userController.getAll);
+userRouter.post("/login", userController.login);
+userRouter.post("/logout/:id", validateJWT, userController.logout);
 
 export default userRouter;
